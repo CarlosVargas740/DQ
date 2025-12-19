@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta Posada - Dairy Queen</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Pacifico&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1a0505;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Fondo animado con patrón */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(230, 57, 70, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(214, 40, 40, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 90%, rgba(157, 2, 8, 0.3) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+        
+        /* Control de música */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .music-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d62828, #9d0208);
+            border: 3px solid white;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(214, 40, 40, 0.5);
+            transition: all 0.3s ease;
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+        
+        .music-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(214, 40, 40, 0.7);
+        }
+        
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(214, 40, 40, 0.5); }
+            50% { box-shadow: 0 10px 30px rgba(214, 40, 40, 0.8), 0 0 20px rgba(255, 255, 255, 0.3); }
+        }
+        
+        .music-note {
+            position: fixed;
+            font-size: 30px;
+            animation: noteFloat 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.7;
+        }
+        
+        @keyframes noteFloat {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-30px) rotate(15deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+        }
+        
+        /* Imágenes de productos DQ reales */
+        .dq-product-img {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            background-size: cover;
+            background-position: center;
+            animation: productBounce 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 2;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dq-product-img.blizzard {
+            background: linear-gradient(135deg, #fff 0%, #f0e6d3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+        
+        @keyframes productBounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
+            25% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+            50% { transform: translateY(-10px) rotate(-3deg) scale(0.95); }
+            75% { transform: translateY(-25px) rotate(8deg) scale(1.02); }
+        }
+        
+        .dq-product-img:nth-of-type(1) { left: 2%; top: 20%; animation-delay: 0s; }
+        .dq-product-img:nth-of-type(2) { right: 2%; top: 25%; animation-delay: 1.5s; }
+        .dq-product-img:nth-of-type(3) { left: 3%; bottom: 20%; animation-delay: 3s; }
+        .dq-product-img:nth-of-type(4) { right: 3%; bottom: 25%; animation-delay: 4.5s; }
+        
+        /* Logo DQ giratorio en las esquinas */
+        .corner-logo {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #d62828, #9d0208);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: logoRotate 10s linear infinite;
+            z-index: 3;
+            box-shadow: 0 10px 30px rgba(214, 40, 40, 0.5);
+            border: 3px solid white;
+        }
+        
+        @keyframes logoRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        .corner-logo.top-left { top: 100px; left: 20px; }
+        .corner-logo.bottom-right { bottom: 20px; right: 20px; animation-direction: reverse; }
+        
+        /* Copos de nieve (tema navideño) */
+        .snowflake {
+            position: fixed;
+            color: white;
+            font-size: 20px;
+            top: -20px;
+            animation: snowfall linear infinite;
+            pointer-events: none;
+            z-index: 4;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        @keyframes snowfall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.3; }
+        }
+        
+        /* Luces navideñas */
+        .christmas-lights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+        
+        .light-bulb {
+            width: 15px;
+            height: 25px;
+            border-radius: 50% 50% 50% 50%;
+            animation: lightGlow 1s ease-in-out infinite alternate;
+            box-shadow: 0 5px 20px currentColor;
+        }
+        
+        .light-bulb:nth-child(odd) { background: #ff0000; color: #ff0000; animation-delay: 0s; }
+        .light-bulb:nth-child(even) { background: #00ff00; color: #00ff00; animation-delay: 0.5s; }
+        .light-bulb:nth-child(3n) { background: #ffd700; color: #ffd700; animation-delay: 0.25s; }
+        .light-bulb:nth-child(4n) { background: #00bfff; color: #00bfff; animation-delay: 0.75s; }
+        
+        @keyframes lightGlow {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        /* Pantalla de ya votaste */
+        .already-voted-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0505 0%, #2d0a0a 100%);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .already-voted-screen.show {
+            display: flex;
+        }
+        
+        .already-voted-box {
+            background: linear-gradient(135deg, rgba(214, 40, 40, 0.3), rgba(157, 2, 8, 0.3));
+            backdrop-filter: blur(20px);
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 60px 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            animation: boxAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes boxAppear {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .already-voted-box h1 {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .already-voted-box p {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .already-voted-box .emoji-big {
+            font-size: 100px;
+            margin-bottom: 30px;
+            display: block;
+            animation: emojiBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes emojiBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .vote-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .vote-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Partículas flotantes */
+        .particle {
+            position: fixed;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: particleFloat 10s infinite ease-in-out;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0.3;
+            }
+        }
+        
+        /* Imágenes flotantes de productos DQ */
+        .floating-product {
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: floatProduct 20s infinite ease-in-out;
+            opacity: 0.4;
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(214, 40, 40, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes floatProduct {
+            0%, 100% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-50px) translateX(30px) rotate(10deg) scale(1.1);
+            }
+            50% {
+                transform: translateY(-20px) translateX(-20px) rotate(-5deg) scale(0.9);
+            }
+            75% {
+                transform: translateY(-40px) translateX(40px) rotate(15deg) scale(1.05);
+            }
+        }
+        
+        .floating-product:nth-child(1) { left: 5%; top: 10%; animation-delay: 0s; }
+        .floating-product:nth-child(2) { left: 85%; top: 15%; animation-delay: 3s; }
+        .floating-product:nth-child(3) { left: 10%; top: 75%; animation-delay: 6s; }
+        .floating-product:nth-child(4) { left: 90%; top: 80%; animation-delay: 9s; }
+        .floating-product:nth-child(5) { left: 50%; top: 5%; animation-delay: 12s; }
+        .floating-product:nth-child(6) { left: 45%; top: 90%; animation-delay: 15s; }
+        
+        .container {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8f8 100%);
+            border-radius: 40px;
+            box-shadow: 
+                0 50px 100px rgba(214, 40, 40, 0.4),
+                0 0 0 1px rgba(214, 40, 40, 0.1),
+                inset 0 0 60px rgba(214, 40, 40, 0.05);
+            max-width: 900px;
+            width: 100%;
+            padding: 60px;
+            position: relative;
+            z-index: 10;
+            animation: slideIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(214, 40, 40, 0.03) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(100px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: logoEntrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 2;
+        }
+        
+        @keyframes logoEntrance {
+            0% { 
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(214, 40, 40, 0.2) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: pulse 3s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        .dq-logo-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d62828 0%, #9d0208 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 
+                0 20px 60px rgba(214, 40, 40, 0.5),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.2);
+            animation: logoSpin 4s ease-in-out infinite;
+            border: 5px solid white;
+        }
+        
+        @keyframes logoSpin {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.05); }
+        }
+        
+        .dq-logo-image span {
+            font-size: 90px;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        }
+        
+        .dq-logo-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 56px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #d62828 0%, #9d0208 50%, #d62828 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(214, 40, 40, 0.3);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            animation: textShine 3s ease-in-out infinite;
+            position: relative;
+        }
+        
+        @keyframes textShine {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #d62828;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .fun-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        .question-section {
+            margin-bottom: 50px;
+            margin-top: 50px;
+            padding: 45px 35px 35px 35px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 50%, #ffe8e8 100%);
+            border-radius: 25px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: visible;
+            box-shadow: 0 10px 30px rgba(214, 40, 40, 0.15);
+        }
+        
+        .question-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #d62828, #e63946, #d62828, #9d0208);
+            background-size: 300% 300%;
+            border-radius: 25px;
+            z-index: -1;
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .question-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .question-section:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(214, 40, 40, 0.3);
+        }
+        
+        .question-section:hover::after {
+            left: 100%;
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -40px;
+            left: 30px;
+            background: linear-gradient(135deg, #ff1744 0%, #d62828 50%, #c62828 100%);
+            color: white;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 36px;
+            box-shadow: 
+                0 15px 40px rgba(214, 40, 40, 0.8),
+                0 0 0 6px white,
+                0 0 0 9px #d62828,
+                inset 0 3px 10px rgba(255, 255, 255, 0.4),
+                inset 0 -3px 10px rgba(0, 0, 0, 0.4);
+            animation: numberPulse 2.5s ease-in-out infinite;
+            z-index: 100;
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.4),
+                0 0 15px rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes numberPulse {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 10px 30px rgba(214, 40, 40, 0.6),
+                            0 0 0 5px white,
+                            0 0 0 7px #d62828,
+                            inset 0 3px 10px rgba(255, 255, 255, 0.3),
+                            inset 0 -3px 10px rgba(0, 0, 0, 0.3);
+            }
+            50% { 
+                transform: scale(1.1) rotate(3deg);
+                box-shadow: 0 15px 40px rgba(214, 40, 40, 0.8),
+                            0 0 0 5px white,
+                            0 0 0 7px #d62828,
+                            0 0 20px rgba(214, 40, 40, 0.5),
+                            inset 0 3px 10px rgba(255, 255, 255, 0.4),
+                            inset 0 -3px 10px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        .question-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            line-height: 1.4;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .emoji {
+            font-size: 32px;
+            margin-right: 12px;
+            display: inline-block;
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(5deg); }
+        }
+        
+        select {
+            width: 100%;
+            padding: 20px 30px;
+            font-size: 18px;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: white;
+            color: #333;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(214, 40, 40, 0.1);
+            position: relative;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d62828' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 20px;
+            padding-right: 60px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #d62828;
+            box-shadow: 
+                0 10px 40px rgba(214, 40, 40, 0.3),
+                0 0 0 5px rgba(214, 40, 40, 0.1);
+            transform: translateY(-3px) scale(1.02);
+            background-color: #fff8f8;
+        }
+        
+        select option {
+            padding: 15px;
+            font-weight: 600;
+            background: white;
+            color: #333;
+        }
+        
+        select option:hover {
+            background: #ffe5e5;
+        }
+        
+        /* Botón de resultados */
+        .results-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #d62828;
+            background: white;
+            border: 4px solid #d62828;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(214, 40, 40, 0.2);
+        }
+        
+        .results-btn:hover {
+            background: #d62828;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(214, 40, 40, 0.4);
+        }
+        
+        /* Sección de resultados */
+        .submit-btn {
+            width: 100%;
+            padding: 25px;
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            background: linear-gradient(135deg, #d62828 0%, #e63946 50%, #d62828 100%);
+            background-size: 200% 200%;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 
+                0 15px 40px rgba(214, 40, 40, 0.5),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .submit-btn:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 
+                0 25px 60px rgba(214, 40, 40, 0.7),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.3);
+            background-position: 100% 0;
+        }
+        
+        .submit-btn:hover:before {
+            width: 600px;
+            height: 600px;
+        }
+        
+        .submit-btn:active {
+            transform: translateY(-3px) scale(0.98);
+        }
+        
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            animation: btnTextFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes btnTextFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #d62828;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 50%, #4caf50 100%);
+            background-size: 200% 200%;
+            color: white;
+            border-radius: 25px;
+            margin-top: 30px;
+            font-size: 28px;
+            font-weight: 800;
+            animation: successEnter 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 20px 60px rgba(76, 175, 80, 0.5);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes successEnter {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        .success-message::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: successShine 2s infinite;
+        }
+        
+        @keyframes successShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Animación de carga */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d62828;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .dq-logo-text {
+                font-size: 36px;
+            }
+            
+            .subtitle {
+                font-size: 20px;
+            }
+            
+            .question-section {
+                padding: 45px 25px 30px 25px;
+                margin-top: 45px;
+            }
+            
+            .question-number {
+                width: 65px;
+                height: 65px;
+                font-size: 30px;
+                top: -35px;
+                left: 20px;
+            }
+            
+            .question-title {
+                font-size: 18px;
+            }
+            
+            input[type="text"], select {
+                font-size: 16px;
+                padding: 15px 20px;
+            }
+            
+            .submit-btn {
+                font-size: 18px;
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de ya votaste -->
+    <div class="already-voted-screen" id="alreadyVotedScreen">
+        <div class="already-voted-box">
+            <span class="emoji-big">🎄</span>
+            <h1>¡Ya participaste!</h1>
+            <p>Gracias por votar en la encuesta de la Posada DQ 2025.<br>Solo se permite una participación por persona.</p>
+            <div class="vote-info">
+                <p>📅 <strong>Fecha de tu voto:</strong> <span id="voteDate">-</span></p>
+                <p>🕐 <strong>Hora:</strong> <span id="voteTime">-</span></p>
+            </div>
+            <a href="resultados-dq.html" style="display: inline-block; margin-top: 30px; padding: 18px 40px; background: linear-gradient(135deg, #d62828, #9d0208); color: white; text-decoration: none; border-radius: 15px; font-weight: 700; font-size: 18px; box-shadow: 0 10px 30px rgba(214, 40, 40, 0.5); transition: all 0.3s ease;">📊 Ver Resultados</a>
+        </div>
+    </div>
+    
+    <!-- Reproductor de música navideña -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Control de música -->
+    <div class="music-control">
+        <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</button>
+    </div>
+    
+    <!-- Luces navideñas -->
+    <div class="christmas-lights" id="christmasLights"></div>
+    
+    <!-- Logos DQ en las esquinas -->
+    <div class="corner-logo top-left">🍦</div>
+    <div class="corner-logo bottom-right">🍦</div>
+    
+    <!-- Imágenes de productos DQ -->
+    <div class="dq-product-img blizzard">🍨</div>
+    <div class="dq-product-img blizzard">🍦</div>
+    <div class="dq-product-img blizzard">🥤</div>
+    <div class="dq-product-img blizzard">🍔</div>
+    
+    <!-- Notas musicales flotantes -->
+    <div class="music-note" style="left: 10%; top: 30%;">🎵</div>
+    <div class="music-note" style="left: 85%; top: 40%; animation-delay: 1s;">🎶</div>
+    <div class="music-note" style="left: 15%; top: 60%; animation-delay: 2s;">🎵</div>
+    <div class="music-note" style="left: 80%; top: 70%; animation-delay: 1.5s;">🎶</div>
+    
+    <!-- Partículas de fondo -->
+    <script>
+        // Crear partículas
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 4 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+            document.body.appendChild(particle);
+        }
+        
+        // ========== SISTEMA DE RESTRICCIÓN DE VOTO ÚNICO ==========
+        // Generar ID único del dispositivo/navegador
+        function generateDeviceId() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('DQ2025', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            const screenData = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const language = navigator.language;
+            const platform = navigator.platform;
+            
+            const rawId = canvasData + screenData + timezone + language + platform;
+            
+            // Simple hash
+            let hash = 0;
+            for (let i = 0; i < rawId.length; i++) {
+                const char = rawId.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return 'DQ_' + Math.abs(hash).toString(36);
+        }
+        
+        const deviceId = generateDeviceId();
+        
+        // Verificar si ya votó
+        function checkIfAlreadyVoted() {
+            const votedDevices = JSON.parse(localStorage.getItem('votedDevicesDQ') || '[]');
+            const voteInfo = localStorage.getItem('myVoteInfoDQ');
+            
+            if (votedDevices.includes(deviceId) || voteInfo) {
+                // Ya votó, mostrar pantalla
+                document.getElementById('alreadyVotedScreen').classList.add('show');
+                
+                // Mostrar info del voto
+                if (voteInfo) {
+                    const info = JSON.parse(voteInfo);
+                    const fecha = new Date(info.timestamp);
+                    document.getElementById('voteDate').textContent = fecha.toLocaleDateString('es-MX', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    document.getElementById('voteTime').textContent = fecha.toLocaleTimeString('es-MX');
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        // Marcar como votado
+        function markAsVoted() {
+            const votedDevices = JSON.parse(localStorage.getItem('votedDevicesDQ') || '[]');
+            votedDevices.push(deviceId);
+            localStorage.setItem('votedDevicesDQ', JSON.stringify(votedDevices));
+            
+            // Guardar info del voto
+            localStorage.setItem('myVoteInfoDQ', JSON.stringify({
+                deviceId: deviceId,
+                timestamp: new Date().toISOString()
+            }));
+        }
+        
+        // Verificar al cargar la página
+        checkIfAlreadyVoted();
+        
+        // Crear copos de nieve
+        function createSnowflakes() {
+            const snowflakes = ['❄', '❅', '❆', '✻', '✼'];
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerText = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's';
+                snowflake.style.animationDelay = Math.random() * 10 + 's';
+                snowflake.style.fontSize = Math.random() * 15 + 10 + 'px';
+                document.body.appendChild(snowflake);
+            }
+        }
+        createSnowflakes();
+        
+        // Crear luces navideñas
+        const lightsContainer = document.getElementById('christmasLights');
+        for (let i = 0; i < 25; i++) {
+            const bulb = document.createElement('div');
+            bulb.className = 'light-bulb';
+            lightsContainer.appendChild(bulb);
+        }
+        
+        // Control de música
+        let musicPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicBtn.innerText = '🔇';
+                musicBtn.style.animation = 'none';
+            } else {
+                bgMusic.volume = 0.3;
+                bgMusic.play().catch(e => console.log('Autoplay bloqueado'));
+                musicBtn.innerText = '🎵';
+                musicBtn.style.animation = 'musicPulse 2s ease-in-out infinite';
+            }
+            musicPlaying = !musicPlaying;
+        }
+        
+        // Intentar reproducir música automáticamente después de interacción
+        document.addEventListener('click', function initMusic() {
+            if (!musicPlaying) {
+                bgMusic.volume = 0.3;
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicBtn.innerText = '🎵';
+                }).catch(e => console.log('Esperando interacción del usuario'));
+            }
+        }, { once: true });
+    </script>
+    
+    <!-- Productos flotantes de Dairy Queen -->
+    <div class="floating-product">🍦</div>
+    <div class="floating-product">🍨</div>
+    <div class="floating-product">🍰</div>
+    <div class="floating-product">🥤</div>
+    <div class="floating-product">🍔</div>
+    <div class="floating-product">🍟</div>
+    
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-wrapper">
+                <div class="dq-logo-image">
+                    <span>🍦</span>
+                </div>
+            </div>
+            <div class="dq-logo-text">DAIRY QUEEN</div>
+            <div class="subtitle">🎄 Encuesta Posada 2025 🎄</div>
+            <div class="fun-text">¡Es hora de ser honestos! 😄</div>
+        </div>
+        
+        <form id="encuestaForm" style="margin-top: 40px;">
+            <!-- Pregunta 1 -->
+            <div class="question-section">
+                <div class="question-number">1</div>
+                <div class="question-title">
+                    <span class="emoji">😂</span>¿Quién es el más DIVERTID@?
+                </div>
+                <select name="divertido" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 2 -->
+            <div class="question-section">
+                <div class="question-number">2</div>
+                <div class="question-title">
+                    <span class="emoji">😎</span>¿Quién es el más GUAP@?
+                </div>
+                <select name="guapo" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 3 -->
+            <div class="question-section">
+                <div class="question-number">3</div>
+                <div class="question-title">
+                    <span class="emoji">🤝</span>¿Quién es la/el mejor COMPAÑER@ de turno?
+                </div>
+                <select name="companero" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 4 -->
+            <div class="question-section">
+                <div class="question-number">4</div>
+                <div class="question-title">
+                    <span class="emoji">😴</span>¿Quién es la/el más FLOJ@?
+                </div>
+                <select name="flojo" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 5 -->
+            <div class="question-section">
+                <div class="question-number">5</div>
+                <div class="question-title">
+                    <span class="emoji">⚡</span>¿Quién es el más RÁPIDO?
+                </div>
+                <select name="rapido" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 6 -->
+            <div class="question-section">
+                <div class="question-number">6</div>
+                <div class="question-title">
+                    <span class="emoji">💰</span>¿Quién es el mejor CAJERO?
+                </div>
+                <select name="cajero" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 7 -->
+            <div class="question-section">
+                <div class="question-number">7</div>
+                <div class="question-title">
+                    <span class="emoji">🌙</span>¿Quién es el más DISTRAÍDO?
+                </div>
+                <select name="distraido" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 8 -->
+            <div class="question-section">
+                <div class="question-number">8</div>
+                <div class="question-title">
+                    <span class="emoji">😏</span>¿Quién es el más COQUETO?
+                </div>
+                <select name="coqueto" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 9 -->
+            <div class="question-section">
+                <div class="question-number">9</div>
+                <div class="question-title">
+                    <span class="emoji">⏰</span>¿Quién es el más PUNTUAL?
+                </div>
+                <select name="puntual" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <!-- Pregunta 10 -->
+            <div class="question-section">
+                <div class="question-number">10</div>
+                <div class="question-title">
+                    <span class="emoji">✨</span>¿Quién es el más LIMPIO?
+                </div>
+                <select name="limpio" required>
+                    <option value="">Selecciona un compañero...</option>
+                    <option value="Ivan">Ivan</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Alexis">Alexis</option>
+                    <option value="Lilian">Lilian</option>
+                    <option value="Gaytan">Gaytan</option>
+                    <option value="Jose Miguel">Jose Miguel</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Oscar">Oscar</option>
+                    <option value="Melissa">Melissa</option>
+                    <option value="Jesus">Jesus</option>
+                    <option value="Leo">Leo</option>
+                    <option value="Claudia">Claudia</option>
+                    <option value="Diego">Diego</option>
+                    <option value="Omar">Omar</option>
+                    <option value="Cecilia">Cecilia</option>
+                    <option value="Sergio">Sergio</option>
+                    <option value="Abi">Abi</option>
+                    <option value="Belen">Belen</option>
+                    <option value="Chew">Chew</option>
+                    <option value="Alex">Alex</option>
+                    <option value="Andrea">Andrea</option>
+                    <option value="Carlos">Carlos</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <span>🎁 Enviar Respuestas 🎁</span>
+            </button>
+            
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #d62828; font-weight: 600;">Enviando...</p>
+            </div>
+            
+            <div class="success-message">
+                <div style="font-size: 60px; margin-bottom: 15px;">🎉</div>
+                ¡Gracias por participar en la encuesta!
+                <div style="font-size: 18px; margin-top: 10px; opacity: 0.9;">
+                    Tus respuestas han sido guardadas 🎄
+                </div>
+            </div>
+        </form>
+        
+        <a href="resultados-dq.html" class="results-btn" style="text-decoration: none; display: inline-block; text-align: center;">
+            📊 Ver Resultados de la Votación
+        </a>
+    </div>
+    
+    <script>
+        // Función para crear confetti mejorado
+        function createConfetti() {
+            const confettiCount = 100;
+            const colors = ['#d62828', '#9d0208', '#e63946', '#fff', '#ffd700', '#ff6b6b', '#ee5a6f'];
+            const emojis = ['🍦', '🍨', '🎉', '⭐', '✨', '🎊', '🎈'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-20px';
+                    confetti.style.zIndex = '1000';
+                    
+                    // 50% emojis, 50% círculos
+                    if (Math.random() > 0.5) {
+                        confetti.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                        confetti.style.fontSize = Math.random() * 20 + 15 + 'px';
+                        confetti.style.background = 'transparent';
+                    } else {
+                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.width = Math.random() * 15 + 5 + 'px';
+                        confetti.style.height = confetti.style.width;
+                        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    }
+                    
+                    confetti.style.animation = `confetti-fall ${Math.random() * 2 + 2}s linear`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 20);
+            }
+        }
+        
+        // Manejo del formulario
+        document.getElementById('encuestaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Ocultar botón y mostrar loading
+            const submitBtn = this.querySelector('.submit-btn');
+            const loading = this.querySelector('.loading');
+            const successMsg = this.querySelector('.success-message');
+            
+            submitBtn.style.display = 'none';
+            loading.classList.add('show');
+            
+            // Recopilar datos
+            const formData = new FormData(this);
+            const respuestas = {};
+            
+            for (let [key, value] of formData.entries()) {
+                respuestas[key] = value;
+            }
+            
+            // Simular envío (aquí puedes agregar integración con backend)
+            console.log('Respuestas:', respuestas);
+            
+            // Guardar en localStorage para demostración
+            const timestamp = new Date().toISOString();
+            respuestas.timestamp = timestamp;
+            
+            let encuestas = JSON.parse(localStorage.getItem('encuestasDQ') || '[]');
+            encuestas.push(respuestas);
+            localStorage.setItem('encuestasDQ', JSON.stringify(encuestas));
+            
+            // Actualizar conteo de votos por pregunta y por empleado
+            let votos = JSON.parse(localStorage.getItem('votosDQ') || '{}');
+            
+            for (let [pregunta, empleado] of formData.entries()) {
+                if (!votos[pregunta]) {
+                    votos[pregunta] = {};
+                }
+                if (!votos[pregunta][empleado]) {
+                    votos[pregunta][empleado] = 0;
+                }
+                votos[pregunta][empleado]++;
+            }
+            
+            localStorage.setItem('votosDQ', JSON.stringify(votos));
+            
+            // ===== MARCAR COMO VOTADO =====
+            markAsVoted();
+            
+            // Mostrar mensaje de éxito después de 1.5 segundos
+            setTimeout(() => {
+                loading.classList.remove('show');
+                successMsg.classList.add('show');
+                createConfetti();
+                
+                // Scroll suave al mensaje
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Mostrar pantalla de ya votaste después de 5 segundos
+                setTimeout(() => {
+                    document.getElementById('alreadyVotedScreen').classList.add('show');
+                    const fecha = new Date();
+                    document.getElementById('voteDate').textContent = fecha.toLocaleDateString('es-MX', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    document.getElementById('voteTime').textContent = fecha.toLocaleTimeString('es-MX');
+                }, 5000);
+            }, 1500);
+        });
+        
+        // Animación de entrada mejorada para las preguntas
+        const questions = document.querySelectorAll('.question-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const index = Array.from(questions).indexOf(entry.target);
+                    setTimeout(() => {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateX(-100px) rotate(-5deg) scale(0.8)';
+                        setTimeout(() => {
+                            entry.target.style.transition = 'all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateX(0) rotate(0deg) scale(1)';
+                        }, 50);
+                    }, index * 150);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        questions.forEach(question => {
+            observer.observe(question);
+        });
+        
+        // Efecto de brillo al scroll
+        window.addEventListener('scroll', () => {
+            questions.forEach((question, index) => {
+                const rect = question.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                
+                if (isVisible) {
+                    const visibility = 1 - Math.abs(rect.top - window.innerHeight / 2) / (window.innerHeight / 2);
+                    question.style.filter = `brightness(${0.9 + visibility * 0.2})`;
+                }
+            });
+        });
+        
+        // Efecto en los selects
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            select.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Crear efecto de estrellas brillantes
+        function createStars() {
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.innerHTML = '⭐';
+                star.style.cssText = `
+                    position: fixed;
+                    font-size: ${Math.random() * 15 + 10}px;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: starTwinkle ${Math.random() * 3 + 2}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 3}s;
+                    pointer-events: none;
+                    z-index: 1;
+                    opacity: 0.6;
+                `;
+                document.body.appendChild(star);
+            }
+        }
+        createStars();
+        
+        // Agregar animación de estrellas al CSS
+        const starStyle = document.createElement('style');
+        starStyle.textContent = `
+            @keyframes starTwinkle {
+                0%, 100% { opacity: 0.3; transform: scale(0.8); }
+                50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 10px gold); }
+            }
+        `;
+        document.head.appendChild(starStyle);
+        
+        // Efecto de nieve continua
+        setInterval(() => {
+            const snowflakes = ['❄', '❅', '❆'];
+            const flake = document.createElement('div');
+            flake.className = 'snowflake';
+            flake.innerText = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+            flake.style.left = Math.random() * 100 + '%';
+            flake.style.animationDuration = Math.random() * 5 + 5 + 's';
+            flake.style.fontSize = Math.random() * 15 + 10 + 'px';
+            document.body.appendChild(flake);
+            
+            // Eliminar después de la animación
+            setTimeout(() => flake.remove(), 10000);
+        }, 500);
+        
+        // Efecto de brillo en el logo al pasar el mouse
+        const logo = document.querySelector('.dq-logo-image');
+        if (logo) {
+            logo.addEventListener('mouseenter', function() {
+                this.style.animation = 'none';
+                this.style.transform = 'scale(1.2) rotate(10deg)';
+                this.style.boxShadow = '0 30px 80px rgba(214, 40, 40, 0.8), 0 0 50px rgba(255, 215, 0, 0.5)';
+            });
+            
+            logo.addEventListener('mouseleave', function() {
+                this.style.animation = 'logoSpin 4s ease-in-out infinite';
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        }
+        
+        // Crear burbujas flotantes
+        function createBubbles() {
+            setInterval(() => {
+                const bubble = document.createElement('div');
+                const emojis = ['🍦', '🍨', '🧁', '🎂', '🍰'];
+                bubble.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                bubble.style.cssText = `
+                    position: fixed;
+                    bottom: -50px;
+                    left: ${Math.random() * 100}%;
+                    font-size: ${Math.random() * 30 + 20}px;
+                    animation: bubbleRise ${Math.random() * 5 + 5}s ease-out forwards;
+                    pointer-events: none;
+                    z-index: 2;
+                    opacity: 0.7;
+                `;
+                document.body.appendChild(bubble);
+                
+                setTimeout(() => bubble.remove(), 10000);
+            }, 2000);
+        }
+        
+        // Agregar animación de burbujas
+        const bubbleStyle = document.createElement('style');
+        bubbleStyle.textContent = `
+            @keyframes bubbleRise {
+                0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+                50% { transform: translateY(-50vh) rotate(180deg); opacity: 0.5; }
+                100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(bubbleStyle);
+        createBubbles();
+        
+        // Mensaje de bienvenida animado
+        setTimeout(() => {
+            const welcome = document.createElement('div');
+            welcome.innerHTML = '🎄 ¡Bienvenido a la Encuesta de Posada DQ 2025! 🎄';
+            welcome.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                background: linear-gradient(135deg, #d62828, #9d0208);
+                color: white;
+                padding: 30px 50px;
+                border-radius: 20px;
+                font-size: 24px;
+                font-weight: 700;
+                z-index: 2000;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                border: 4px solid white;
+                text-align: center;
+                animation: welcomeIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            `;
+            document.body.appendChild(welcome);
+            
+            const welcomeStyle = document.createElement('style');
+            welcomeStyle.textContent = `
+                @keyframes welcomeIn {
+                    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+                    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+                }
+            `;
+            document.head.appendChild(welcomeStyle);
+            
+            setTimeout(() => {
+                welcome.style.animation = 'welcomeOut 0.5s ease-in forwards';
+                const outStyle = document.createElement('style');
+                outStyle.textContent = `
+                    @keyframes welcomeOut {
+                        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                        100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(outStyle);
+                setTimeout(() => welcome.remove(), 500);
+            }, 3000);
+        }, 1000);
+    </script>
+</body>
+</html>
