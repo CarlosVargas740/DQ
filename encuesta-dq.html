@@ -1508,7 +1508,7 @@
         }
         
         // Manejo del formulario
-        document.getElementById('encuestaForm').addEventListener('submit', function(e) {
+        document.getElementById('encuestaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Ocultar botón y mostrar loading
@@ -1527,18 +1527,35 @@
                 respuestas[key] = value;
             }
             
-            // Simular envío (aquí puedes agregar integración con backend)
-            console.log('Respuestas:', respuestas);
-            
-            // Guardar en localStorage para demostración
+            // Agregar timestamp y deviceId
             const timestamp = new Date().toISOString();
             respuestas.timestamp = timestamp;
+            respuestas.deviceId = deviceId;
             
+            // ===== ENVIAR A GOOGLE SHEETS =====
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5MOTGp1Y3-XahcyM-FUXJkaNqY6EY898uEfv7SGtBUORvQMrysoCrNIBHgivViz3W0g/exec';
+            
+            try {
+                // Enviar datos a Google Sheets
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(respuestas)
+                });
+                console.log('Datos enviados a Google Sheets');
+            } catch (error) {
+                console.error('Error al enviar a Google Sheets:', error);
+            }
+            
+            // También guardar en localStorage como respaldo
             let encuestas = JSON.parse(localStorage.getItem('encuestasDQ') || '[]');
             encuestas.push(respuestas);
             localStorage.setItem('encuestasDQ', JSON.stringify(encuestas));
             
-            // Actualizar conteo de votos por pregunta y por empleado
+            // Actualizar conteo de votos local
             let votos = JSON.parse(localStorage.getItem('votosDQ') || '{}');
             
             for (let [pregunta, empleado] of formData.entries()) {

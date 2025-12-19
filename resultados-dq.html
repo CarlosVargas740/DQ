@@ -388,12 +388,68 @@
             'limpio': { titulo: '✨ ¿Quién es el más LIMPIO?', emoji: '✨' }
         };
         
-        function cargarResultados() {
-            const votos = JSON.parse(localStorage.getItem('votosDQ') || '{}');
-            const encuestas = JSON.parse(localStorage.getItem('encuestasDQ') || '[]');
+        // ===== URL DE GOOGLE SHEETS (CAMBIAR ESTO) =====
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx5MOTGp1Y3-XahcyM-FUXJkaNqY6EY898uEfv7SGtBUORvQMrysoCrNIBHgivViz3W0g/exec';
+        
+        // Cargar datos desde Google Sheets
+        async function cargarDatosDesdeSheets() {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                return null;
+            }
+        }
+        
+        // Procesar datos de sheets a formato de votos
+        function procesarDatosSheets(data) {
+            if (!data || !data.values || data.values.length < 2) return { votos: {}, total: 0 };
+            
+            const headers = data.values[0];
+            const rows = data.values.slice(1);
+            
+            const votos = {};
+            const preguntas = ['divertido', 'guapo', 'companero', 'flojo', 'rapido', 'cajero', 'distraido', 'coqueto', 'puntual', 'limpio'];
+            
+            rows.forEach(row => {
+                preguntas.forEach((pregunta, index) => {
+                    const empleado = row[index];
+                    if (empleado) {
+                        if (!votos[pregunta]) votos[pregunta] = {};
+                        if (!votos[pregunta][empleado]) votos[pregunta][empleado] = 0;
+                        votos[pregunta][empleado]++;
+                    }
+                });
+            });
+            
+            return { votos, total: rows.length };
+        }
+        
+        async function cargarResultados() {
             const container = document.getElementById('resultados-container');
             const noVotes = document.getElementById('no-votes');
             const totalVotosEl = document.getElementById('totalVotos');
+            
+            // Mostrar loading
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: white;"><div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #d62828; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div><p style="margin-top: 20px;">Cargando resultados desde la nube...</p></div>';
+            
+            // Intentar cargar desde Google Sheets
+            let votos = {};
+            let totalEncuestas = 0;
+            
+            const sheetsData = await cargarDatosDesdeSheets();
+            if (sheetsData && sheetsData.values) {
+                const resultado = procesarDatosSheets(sheetsData);
+                votos = resultado.votos;
+                totalEncuestas = resultado.total;
+            } else {
+                // Fallback a localStorage
+                votos = JSON.parse(localStorage.getItem('votosDQ') || '{}');
+                const encuestas = JSON.parse(localStorage.getItem('encuestasDQ') || '[]');
+                totalEncuestas = encuestas.length;
+            }
             
             if (Object.keys(votos).length === 0) {
                 noVotes.style.display = 'block';
@@ -403,7 +459,7 @@
             }
             
             noVotes.style.display = 'none';
-            totalVotosEl.textContent = `Total de encuestas completadas: ${encuestas.length}`;
+            totalVotosEl.textContent = `Total de encuestas completadas: ${totalEncuestas}`;
             container.innerHTML = '';
             
             // Iterar sobre cada pregunta
