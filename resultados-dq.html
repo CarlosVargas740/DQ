@@ -418,28 +418,52 @@
                     } else if (char === ',' && !inQuotes) {
                         result.push(current.trim());
                         current = '';
-                    } else {
+                    } else if (char !== '\r') {
                         current += char;
                     }
                 }
                 result.push(current.trim());
                 return result;
-            }).filter(row => row.length > 1 || row[0] !== '');
+            }).filter(row => row.length > 1 || (row[0] && row[0] !== ''));
         }
         
         // Procesar datos CSV a formato de votos
         function procesarDatosCSV(rows) {
-            if (!rows || rows.length < 2) return { votos: {}, total: 0 };
+            console.log('📊 Filas recibidas:', rows);
             
-            const headers = rows[0];
-            const dataRows = rows.slice(1);
+            if (!rows || rows.length < 1) {
+                console.log('❌ No hay filas');
+                return { votos: {}, total: 0 };
+            }
+            
+            const headers = rows[0].map(h => h.toLowerCase().trim());
+            console.log('📋 Encabezados:', headers);
+            
+            const dataRows = rows.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ''));
+            console.log('📝 Filas de datos:', dataRows.length);
+            
+            if (dataRows.length === 0) {
+                console.log('❌ No hay filas de datos');
+                return { votos: {}, total: 0 };
+            }
             
             const votos = {};
             const preguntas = ['divertido', 'guapo', 'companero', 'flojo', 'rapido', 'cajero', 'distraido', 'coqueto', 'puntual', 'limpio'];
             
-            dataRows.forEach(row => {
+            dataRows.forEach((row, rowIndex) => {
+                console.log(`Fila ${rowIndex + 1}:`, row);
                 preguntas.forEach((pregunta, index) => {
-                    const empleado = row[index];
+                    // Buscar por índice o por nombre de encabezado
+                    let empleado = row[index];
+                    
+                    // Si no hay valor en ese índice, buscar por nombre de columna
+                    if (!empleado) {
+                        const headerIndex = headers.indexOf(pregunta);
+                        if (headerIndex !== -1) {
+                            empleado = row[headerIndex];
+                        }
+                    }
+                    
                     if (empleado && empleado.trim() !== '') {
                         if (!votos[pregunta]) votos[pregunta] = {};
                         if (!votos[pregunta][empleado]) votos[pregunta][empleado] = 0;
@@ -448,6 +472,7 @@
                 });
             });
             
+            console.log('📊 Votos procesados:', votos);
             return { votos, total: dataRows.length };
         }
         
@@ -464,9 +489,12 @@
             
             try {
                 // Cargar desde Google Sheets CSV
+                console.log('🔄 Cargando CSV desde:', GOOGLE_CSV_URL);
                 const response = await fetch(GOOGLE_CSV_URL);
                 const csvText = await response.text();
+                console.log('📄 CSV recibido:', csvText.substring(0, 500));
                 const rows = parseCSV(csvText);
+                console.log('📊 Filas parseadas:', rows.length);
                 const resultado = procesarDatosCSV(rows);
                 votos = resultado.votos;
                 totalEncuestas = resultado.total;
