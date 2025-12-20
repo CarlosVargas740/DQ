@@ -307,8 +307,9 @@
         
         <div class="buttons">
             <a href="encuesta-dq.html" class="btn">🎁 Ir a la Encuesta</a>
-            <button onclick="limpiarVotos()" class="btn btn-secondary">🗑️ Limpiar Datos</button>
-            <button onclick="resetearUsuarioLocal()" class="btn btn-secondary">🔄 Resetear Mi Voto</button>
+            <button onclick="cargarResultados()" class="btn" style="background: linear-gradient(135deg, #28a745, #218838);">🔄 Actualizar Resultados</button>
+            <button onclick="resetearUsuarioLocal()" class="btn btn-secondary">🔓 Resetear Mi Voto</button>
+            <button onclick="limpiarVotos()" class="btn btn-secondary">🗑️ Limpiar Datos Locales</button>
             <button onclick="cerrarSesion()" class="btn btn-secondary">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -562,19 +563,31 @@
                 localStorage.removeItem('votosDQ');
                 localStorage.removeItem('encuestasDQ');
                 cargarResultados();
-                alert('✅ Datos eliminados correctamente');
+                alert('✅ Datos locales eliminados correctamente\n\n⚠️ Nota: Los datos en Google Sheets no se borran desde aquí.');
+            }
+        }
+        
+        // Función para resetear el voto del usuario actual
+        function resetearUsuarioLocal() {
+            if (confirm('🔄 ¿Deseas resetear tu voto?\n\nEsto te permitirá volver a votar en la encuesta.')) {
+                localStorage.removeItem('votedDevicesDQ');
+                localStorage.removeItem('myVoteInfoDQ');
+                localStorage.removeItem('votosDQ');
+                localStorage.removeItem('encuestasDQ');
+                alert('✅ ¡Listo! Tu voto ha sido reseteado.\n\nAhora puedes volver a votar en la encuesta.');
+                window.location.href = 'encuesta-dq.html';
             }
         }
         
         // Verificar autenticación al cargar la página
         verificarAutenticacion();
         
-        // Actualizar cada 5 segundos si la página está abierta y autenticada
+        // Actualizar cada 30 segundos (antes era 5 segundos, muy frecuente)
         setInterval(() => {
             if (sessionStorage.getItem('dq_auth') === 'true') {
                 cargarResultados();
             }
-        }, 5000);
+        }, 30000);
         
         // Agregar animación de shake para error
         const style = document.createElement('style');
