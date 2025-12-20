@@ -308,6 +308,7 @@
         <div class="buttons">
             <a href="encuesta-dq.html" class="btn">🎁 Ir a la Encuesta</a>
             <button onclick="limpiarVotos()" class="btn btn-secondary">🗑️ Limpiar Datos</button>
+            <button onclick="resetearUsuarioLocal()" class="btn btn-secondary">🔄 Resetear Mi Voto</button>
             <button onclick="cerrarSesion()" class="btn btn-secondary">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -362,6 +363,17 @@
             }
         }
         
+        // Función para resetear el voto del usuario actual
+        function resetearUsuarioLocal() {
+            if (confirm('🔄 ¿Deseas resetear tu voto?\n\nEsto te permitirá volver a votar en la encuesta.')) {
+                localStorage.removeItem('votedDevicesDQ');
+                localStorage.removeItem('myVoteInfoDQ');
+                localStorage.removeItem('votosDQ');
+                localStorage.removeItem('encuestasDQ');
+                alert('✅ ¡Listo! Tu voto ha sido reseteado.\n\nAhora puedes volver a votar en la encuesta.');
+            }
+        }
+        
         // Permitir presionar Enter en el input de contraseña
         document.addEventListener('DOMContentLoaded', function() {
             const passwordInput = document.getElementById('password-input');
@@ -388,35 +400,46 @@
             'limpio': { titulo: '✨ ¿Quién es el más LIMPIO?', emoji: '✨' }
         };
         
-        // ===== URL DE GOOGLE SHEETS (CAMBIAR ESTO) =====
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx5MOTGp1Y3-XahcyM-FUXJkaNqY6EY898uEfv7SGtBUORvQMrysoCrNIBHgivViz3W0g/exec';
+        // ===== URL DEL GOOGLE SHEET PUBLICADO COMO CSV =====
+        const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA37kDBk9eEzdO2KOuY_lSTdYbkzj_98R4vS3r8_HxY9s-ZrZ6MNpITObvYmYsnG8pYjfuMvb95VAx/pub?output=csv';
         
-        // Cargar datos desde Google Sheets
-        async function cargarDatosDesdeSheets() {
-            try {
-                const response = await fetch(GOOGLE_SHEETS_URL);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error cargando datos:', error);
-                return null;
-            }
+        // Parsear CSV a array
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            return lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let char of line) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            }).filter(row => row.length > 1 || row[0] !== '');
         }
         
-        // Procesar datos de sheets a formato de votos
-        function procesarDatosSheets(data) {
-            if (!data || !data.values || data.values.length < 2) return { votos: {}, total: 0 };
+        // Procesar datos CSV a formato de votos
+        function procesarDatosCSV(rows) {
+            if (!rows || rows.length < 2) return { votos: {}, total: 0 };
             
-            const headers = data.values[0];
-            const rows = data.values.slice(1);
+            const headers = rows[0];
+            const dataRows = rows.slice(1);
             
             const votos = {};
             const preguntas = ['divertido', 'guapo', 'companero', 'flojo', 'rapido', 'cajero', 'distraido', 'coqueto', 'puntual', 'limpio'];
             
-            rows.forEach(row => {
+            dataRows.forEach(row => {
                 preguntas.forEach((pregunta, index) => {
                     const empleado = row[index];
-                    if (empleado) {
+                    if (empleado && empleado.trim() !== '') {
                         if (!votos[pregunta]) votos[pregunta] = {};
                         if (!votos[pregunta][empleado]) votos[pregunta][empleado] = 0;
                         votos[pregunta][empleado]++;
@@ -424,7 +447,7 @@
                 });
             });
             
-            return { votos, total: rows.length };
+            return { votos, total: dataRows.length };
         }
         
         async function cargarResultados() {
@@ -433,18 +456,22 @@
             const totalVotosEl = document.getElementById('totalVotos');
             
             // Mostrar loading
-            container.innerHTML = '<div style="text-align: center; padding: 40px; color: white;"><div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #d62828; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div><p style="margin-top: 20px;">Cargando resultados desde la nube...</p></div>';
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: white;"><div style="border: 4px solid #f3f3f3; border-top: 4px solid #d62828; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div><p style="margin-top: 20px;">📡 Cargando resultados desde la nube...</p></div>';
             
-            // Intentar cargar desde Google Sheets
             let votos = {};
             let totalEncuestas = 0;
             
-            const sheetsData = await cargarDatosDesdeSheets();
-            if (sheetsData && sheetsData.values) {
-                const resultado = procesarDatosSheets(sheetsData);
+            try {
+                // Cargar desde Google Sheets CSV
+                const response = await fetch(GOOGLE_CSV_URL);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                const resultado = procesarDatosCSV(rows);
                 votos = resultado.votos;
                 totalEncuestas = resultado.total;
-            } else {
+                console.log('✅ Datos cargados desde Google Sheets:', totalEncuestas, 'votos');
+            } catch (error) {
+                console.error('❌ Error cargando desde Sheets, usando localStorage:', error);
                 // Fallback a localStorage
                 votos = JSON.parse(localStorage.getItem('votosDQ') || '{}');
                 const encuestas = JSON.parse(localStorage.getItem('encuestasDQ') || '[]');
@@ -459,7 +486,7 @@
             }
             
             noVotes.style.display = 'none';
-            totalVotosEl.textContent = `Total de encuestas completadas: ${totalEncuestas}`;
+            totalVotosEl.textContent = `Total de encuestas completadas: ${encuestas.length}`;
             container.innerHTML = '';
             
             // Iterar sobre cada pregunta
